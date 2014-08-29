@@ -41,7 +41,7 @@ func getContributions(user string, userData chan Contributions) {
 	var contribData Contributions
 
 	resp, err := http.Get(url)
-	defer resp.Close()
+	defer resp.Body.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
