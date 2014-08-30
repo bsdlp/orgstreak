@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/google/go-github/github"
 )
 
 type contribTime time.Time
@@ -57,6 +59,17 @@ func getContributions(user string, userData chan Contributions) {
 
 	userData <- contribData
 	return
+}
+
+func getOrgMembers(orgName string) []github.User {
+	client := github.NewClient(nil)
+
+	users, _, err := client.Organizations.ListMembers(orgName, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return users
 }
 
 func main() {
