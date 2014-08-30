@@ -38,7 +38,8 @@ func (c *Contribution) UnmarshalJSON(data []byte) error {
 }
 
 func getContributions(user github.User, userData chan []Contribution) {
-	url := "https://github.com/users/" + github.Stringify(user.Login) + "/contributions"
+	login := github.Stringify(user.Login)
+	url := "https://github.com/users/" + login[1:len(login)-1] + "/contributions"
 	var contribData []Contribution
 
 	resp, err := http.Get(url)
