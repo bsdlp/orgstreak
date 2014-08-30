@@ -19,9 +19,6 @@ type ContribData struct {
 
 type Contributions []ContribData
 
-type GHError struct {
-}
-
 const contribDateFmt = "2006-01-02"
 
 func (cTime *contribTime) UnmarshalJSON(data []byte) error {
