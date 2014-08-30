@@ -29,7 +29,7 @@ func (c *Contribution) UnmarshalJSON(data []byte) error {
 	}
 
 	if v, ok := i[1].(float64); ok {
-		c.Name = int(v)
+		c.Num = int(v)
 	}
 
 	return nil
