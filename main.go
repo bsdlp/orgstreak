@@ -11,34 +11,30 @@ import (
 	"github.com/google/go-github/github"
 )
 
-type contribTime time.Time
-
-type ContribData struct {
-	Date          contribTime
-	Contributions int
+type Contribution struct {
+	Date time.Time
+	Num  int
 }
 
-type Contributions []ContribData
-
-const contribDateFmt = "2006-01-02"
-
-func (cTime *contribTime) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	t, err := time.Parse(contribDateFmt, s)
+func (c *Contribution) UnmarshalJSON(data []byte) error {
+	var i []interface{}
+	err := json.Unmarshal(data, &i)
 	if err != nil {
 		return err
 	}
-	*cTime = (contribTime)(t)
+
+	c.Date, err = time.Parse("2006-01-02", i[0].(string))
+	if err != nil {
+		return err
+	}
+
+	c.Num = int(i[1].(float64))
 	return nil
 }
 
-func getContributions(user string, userData chan Contributions) {
+func getContributions(user string, userData chan []Contribution) {
 	url := "https://github.com/users/" + user + "/contributions"
-	var contribData Contributions
+	var contribData []Contribution
 
 	resp, err := http.Get(url)
 	defer resp.Body.Close()
@@ -76,7 +72,7 @@ func getOrgMembers(orgName string) []github.User {
 }
 
 func main() {
-	userData := make(chan Contributions)
+	userData := make(chan []Contribution)
 	go getContributions("fly", userData)
 	data := <-userData
 
