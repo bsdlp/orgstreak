@@ -53,7 +53,6 @@ func getContributions(user string, userData chan []Contribution) {
 	}
 
 	if data != nil {
-		fmt.Println(string(data[:len(data)]))
 		err = json.Unmarshal(data, &contribData)
 	}
 
@@ -78,10 +77,12 @@ func getOrgMembers(orgName string) []github.User {
 
 func main() {
 	userData := make(chan []Contribution)
-	go getContributions("fly", userData)
-	data := <-userData
+	for _, user := range getOrgMembers("linode") {
+		go getContributions(user.String(), userData)
+	}
+	close(userData)
 
-	for x := range data {
-		fmt.Println(data[x])
+	for contribution := range userData {
+		fmt.Println(contribution)
 	}
 }
