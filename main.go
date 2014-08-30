@@ -23,7 +23,9 @@ func (c *Contribution) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	c.Date, err = time.Parse("2006-01-02", i[0].(string))
+	if v, ok := i[0].(string); ok {
+		c.Date, err = time.Parse("2006-01-02", v)
+	}
 	if err != nil {
 		return err
 	}
