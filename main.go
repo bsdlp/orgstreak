@@ -62,7 +62,6 @@ func getContributions(user github.User, userData chan<- []Contribution) {
 	}
 
 	userData <- contribData
-	return
 }
 
 func getOrgMembers(orgName string) []github.User {
@@ -77,11 +76,11 @@ func getOrgMembers(orgName string) []github.User {
 }
 
 func main() {
-	userData := make(chan []Contribution)
-	for _, user := range getOrgMembers("linode") {
+	users := getOrgMembers("linode")
+	userData := make(chan []Contribution, len(users))
+	for _, user := range users {
 		go getContributions(user, userData)
 	}
-	close(userData)
 
 	for contribution := range userData {
 		fmt.Println(contribution)
