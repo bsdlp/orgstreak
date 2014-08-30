@@ -56,6 +56,10 @@ func getContributions(user string, userData chan Contributions) {
 		err = json.Unmarshal(data, &contribData)
 	}
 
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	userData <- contribData
 	return
 }
