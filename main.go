@@ -37,8 +37,8 @@ func (c *Contribution) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func getContributions(user string, userData chan []Contribution) {
-	url := "https://github.com/users/" + user + "/contributions"
+func getContributions(user github.User, userData chan []Contribution) {
+	url := "https://github.com/users/" + github.Stringify(user.Login) + "/contributions"
 	var contribData []Contribution
 
 	resp, err := http.Get(url)
@@ -78,7 +78,7 @@ func getOrgMembers(orgName string) []github.User {
 func main() {
 	userData := make(chan []Contribution)
 	for _, user := range getOrgMembers("linode") {
-		go getContributions(user.String(), userData)
+		go getContributions(user, userData)
 	}
 	close(userData)
 
