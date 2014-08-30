@@ -51,11 +51,11 @@ func getContributions(user github.User, userData chan []Contribution) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	if data != nil {
-		err = json.Unmarshal(data, &contribData)
+	if data == nil {
+		log.Fatalln("No data returned.")
 	}
 
+	err = json.Unmarshal(data, &contribData)
 	if err != nil {
 		log.Fatal(err)
 	}
