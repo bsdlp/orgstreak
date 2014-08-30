@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,8 +14,8 @@ import (
 type contribTime time.Time
 
 type ContribData struct {
-	date          contribTime
-	contributions int
+	Date          contribTime
+	Contributions int
 }
 
 type Contributions []ContribData
@@ -51,6 +52,7 @@ func getContributions(user string, userData chan Contributions) {
 	}
 
 	if data != nil {
+		fmt.Println(string(data[:len(data)]))
 		err = json.Unmarshal(data, &contribData)
 	}
 
@@ -70,4 +72,11 @@ func getOrgMembers(orgName string) []github.User {
 }
 
 func main() {
+	userData := make(chan Contributions)
+	go getContributions("fly", userData)
+	data := <-userData
+
+	for x := range data {
+		fmt.Println(data[x])
+	}
 }
