@@ -84,11 +84,9 @@ func main() {
 	orgContribMap := make(orgContribs)
 
 	for _, user := range users {
-		func() {
-			for _, contrib := range getContributions(user) {
-				orgContribMap[contrib.Date] += contrib.Num
-			}
-		}()
+		for _, contrib := range getContributions(user) {
+			orgContribMap[contrib.Date] += contrib.Num
+		}
 	}
 
 	contribData := []interface{}{}
