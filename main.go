@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -15,7 +16,9 @@ type Contribution struct {
 	Num  int
 }
 
-type orgContributions map[time.Time]int
+type orgContribs map[time.Time]int
+
+const dateFormat string = "2006-01-02"
 
 func (c *Contribution) UnmarshalJSON(data []byte) error {
 	var i []interface{}
@@ -25,7 +28,7 @@ func (c *Contribution) UnmarshalJSON(data []byte) error {
 	}
 
 	if v, ok := i[0].(string); ok {
-		c.Date, err = time.Parse("2006-01-02", v)
+		c.Date, err = time.Parse(dateFormat, v)
 	}
 	if err != nil {
 		return err
@@ -78,7 +81,7 @@ func getOrgMembers(orgName string) []github.User {
 
 func main() {
 	users := getOrgMembers("linode")
-	orgContribMap := make(orgContributions)
+	orgContribMap := make(orgContribs)
 
 	for _, user := range users {
 		func() {
@@ -87,4 +90,14 @@ func main() {
 			}
 		}()
 	}
+
+	contribData := []interface{}{}
+	for k, v := range orgContribMap {
+		contribData = append(contribData, []interface{}{k.Format(dateFormat), v})
+	}
+	j, err := json.Marshal(contribData)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s", j)
 }
