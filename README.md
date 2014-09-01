@@ -3,6 +3,15 @@
 Get back `json` representation of your organization's GitHub public
 contributions.
 
+## Installation
+
+```
+$ go get github.com/fly/orgstreak
+```
+
+Or if you just want the binary, you can grab the one for your architecture of
+choice from the [releases page](https://github.com/fly/orgstreak/releases)
+
 ## Usage
 
 ```
