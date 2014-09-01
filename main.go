@@ -84,7 +84,7 @@ func main() {
 	var users []github.User
 
 	var v, ok = i.(string)
-	if ok == false {
+	if ok == false || v == "" {
 		log.Fatalln("Usage: orgstreak <orgName>")
 	} else {
 		users = getOrgMembers(v)
