@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -15,6 +14,8 @@ type Contribution struct {
 	Date time.Time
 	Num  int
 }
+
+type orgContributions map[time.Time]int
 
 func (c *Contribution) UnmarshalJSON(data []byte) error {
 	var i []interface{}
@@ -77,21 +78,13 @@ func getOrgMembers(orgName string) []github.User {
 
 func main() {
 	users := getOrgMembers("linode")
-	userData := make(chan []Contribution, len(users))
-
-	go func() {
-		for {
-			contribution, more := <-userData
-			if more {
-				fmt.Println(contribution)
-			} else {
-				return
-			}
-		}
-	}()
+	orgContribMap := make(orgContributions)
 
 	for _, user := range users {
-		userData <- getContributions(user)
+		func() {
+			for _, contrib := range getContributions(user) {
+				orgContribMap[contrib.Date] += contrib.Num
+			}
+		}()
 	}
-	close(userData)
 }
