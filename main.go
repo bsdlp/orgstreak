@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -15,8 +16,6 @@ type Contribution struct {
 	Date time.Time
 	Num  int
 }
-
-type orgContribs map[time.Time]int
 
 const dateFormat string = "2006-01-02"
 
@@ -80,17 +79,27 @@ func getOrgMembers(orgName string) []github.User {
 }
 
 func main() {
-	users := getOrgMembers("linode")
-	orgContribMap := make(orgContribs)
+	flag.Parse()
+	var i interface{} = flag.Arg(0)
+	var users []github.User
+
+	var v, ok = i.(string)
+	if ok == false {
+		log.Fatalln("Usage: orgstreak <orgName>")
+	} else {
+		users = getOrgMembers(v)
+	}
+
+	orgContribs := make(map[time.Time]int)
 
 	for _, user := range users {
 		for _, contrib := range getContributions(user) {
-			orgContribMap[contrib.Date] += contrib.Num
+			orgContribs[contrib.Date] += contrib.Num
 		}
 	}
 
 	contribData := []interface{}{}
-	for k, v := range orgContribMap {
+	for k, v := range orgContribs {
 		contribData = append(contribData, []interface{}{k.Format(dateFormat), v})
 	}
 	j, err := json.Marshal(contribData)
