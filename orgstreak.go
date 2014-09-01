@@ -91,10 +91,20 @@ func main() {
 	}
 
 	orgContribs := make(map[time.Time]int)
+	userContributions := make(chan []Contribution, len(users))
 
 	for _, user := range users {
-		for _, contrib := range getContributions(user) {
-			orgContribs[contrib.Date] += contrib.Num
+		go func(u github.User) {
+			userContributions <- getContributions(u)
+		}(user)
+	}
+
+	for y := 0; y < len(users); y++ {
+		select {
+		case userContribution := <-userContributions:
+			for _, contrib := range userContribution {
+				orgContribs[contrib.Date] += contrib.Num
+			}
 		}
 	}
 
