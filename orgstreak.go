@@ -40,7 +40,7 @@ func (c *Contribution) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func getContributions(user github.User) []Contribution {
+func getContributions(user *github.User) []Contribution {
 	login := github.Stringify(user.Login)
 	url := "https://github.com/users/" + login[1:len(login)-1] + "/contributions"
 	var contribData []Contribution
@@ -94,9 +94,9 @@ func main() {
 	userContributions := make(chan []Contribution, len(users))
 
 	for _, user := range users {
-		go func(u github.User) {
+		go func(u *github.User) {
 			userContributions <- getContributions(u)
-		}(user)
+		}(&user)
 	}
 
 	for y := 0; y < len(users); y++ {
