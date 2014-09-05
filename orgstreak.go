@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/google/go-github/github"
@@ -85,7 +86,8 @@ func main() {
 
 	var v, ok = i.(string)
 	if ok == false || v == "" {
-		log.Fatalln("Usage: orgstreak <orgName>")
+		fmt.Println("Usage: orgstreak <orgName>")
+		os.Exit(1)
 	} else {
 		users = getOrgMembers(v)
 	}
