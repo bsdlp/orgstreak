@@ -6,7 +6,7 @@ GitHub contributions.
 ## Installation
 
 ```
-$ go get github.com/fly/orgstreak
+$ go install github.com/fly/orgstreak
 ```
 
 Or if you just want the binary, you can grab the one for your architecture of
