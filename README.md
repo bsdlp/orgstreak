@@ -11,7 +11,7 @@ $ go get github.com/fly/orgstreak
 
 Or if you just want the binary, you can grab the one for your architecture of
 choice from the [releases
-page](https://github.com/fly/orgstreak/releases/tag/v0.0.2)
+page](https://github.com/fly/orgstreak/releases/tag/v0.0.3)
 
 ## Usage
 
