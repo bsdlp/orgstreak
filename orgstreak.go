@@ -118,5 +118,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%s", j)
+	fmt.Printf("%s\n", j)
 }
