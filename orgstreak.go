@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -13,38 +14,31 @@ import (
 	"github.com/google/go-github/github"
 )
 
+type contribCalendar struct {
+	XMLName xml.Name       `xml:"svg"`
+	Group   containerGroup `xml:"g"`
+}
+
+type containerGroup struct {
+	Groups  []contribGroup `xml:"g"`
+	Markers []string       `xml:"text"`
+}
+
+type contribGroup struct {
+	Rects []Contribution `xml:"rect"`
+}
+
 type Contribution struct {
-	Date time.Time
-	Num  int
+	Date time.Time `xml:"data-date,attr"`
+	Num  int       `xml:"data-count,attr"`
 }
 
 const dateFormat string = "2006-01-02"
 
-func (c *Contribution) UnmarshalJSON(data []byte) error {
-	var i []interface{}
-	err := json.Unmarshal(data, &i)
-	if err != nil {
-		return err
-	}
-
-	if v, ok := i[0].(string); ok {
-		c.Date, err = time.Parse(dateFormat, v)
-	}
-	if err != nil {
-		return err
-	}
-
-	if v, ok := i[1].(float64); ok {
-		c.Num = int(v)
-	}
-
-	return nil
-}
-
 func getContributions(user github.User) []Contribution {
 	login := github.Stringify(user.Login)
-	url := "https://github.com/users/" + login[1:len(login)-1] + "/contributions.json"
-	var contribData []Contribution
+	url := "https://github.com/users/" + login[1:len(login)-1] + "/contributions"
+	var contribData contribCalendar
 
 	resp, err := http.Get(url)
 	defer resp.Body.Close()
@@ -60,12 +54,19 @@ func getContributions(user github.User) []Contribution {
 		log.Fatalln("No data returned.")
 	}
 
-	err = json.Unmarshal(data, &contribData)
+	err = xml.Unmarshal(data, &contribData)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Printf("Groups: %v\n", contribData.Group.Groups)
 
-	return contribData
+	var contributions []Contribution
+
+	for _, group := range contribData.Group.Groups {
+		contributions = append(contributions, group.Rects...)
+	}
+
+	return contributions
 }
 
 func getOrgMembers(orgName string) []github.User {
