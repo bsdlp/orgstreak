@@ -33,35 +33,26 @@ type Contribution struct {
 	Num  int       `xml:"data-count,attr"`
 }
 
+type contributionXML struct {
+	Date string `xml:"data-date,attr"`
+	Num  string `xml:"data-count,attr"`
+}
+
 const dateFormat string = "2006-01-02"
 
 func (c *Contribution) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var i interface{}
+	var i contributionXML
 	err := d.DecodeElement(&i, &start)
 	if err != nil {
 		return err
 	}
 
-	c.Date, err = time.Parse(dateFormat, i.date)
+	c.Date, err = time.Parse(dateFormat, i.Date)
 	if err != nil {
 		return err
 	}
 
-	c.Num, err = strconv.Atoi(i.count)
-	if err != nil {
-		return err
-	}
-
-	if v, ok := i.date.(string); ok {
-		c.Date, err = time.Parse(dateFormat, v)
-	}
-	if err != nil {
-		return err
-	}
-
-	if v, ok := i.count.(string); ok {
-		c.Num, err = strconv.Atoi(v)
-	}
+	c.Num, err = strconv.Atoi(i.Num)
 	if err != nil {
 		return err
 	}
