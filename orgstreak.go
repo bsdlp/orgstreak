@@ -36,20 +36,30 @@ type Contribution struct {
 const dateFormat string = "2006-01-02"
 
 func (c *Contribution) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var i []interface{}
+	var i interface{}
 	err := d.DecodeElement(&i, &start)
 	if err != nil {
 		return err
 	}
 
-	if v, ok := i[0].(string); ok {
+	c.Date, err = time.Parse(dateFormat, i.date)
+	if err != nil {
+		return err
+	}
+
+	c.Num, err = strconv.Atoi(i.count)
+	if err != nil {
+		return err
+	}
+
+	if v, ok := i.date.(string); ok {
 		c.Date, err = time.Parse(dateFormat, v)
 	}
 	if err != nil {
 		return err
 	}
 
-	if v, ok := i[1].(string); ok {
+	if v, ok := i.count.(string); ok {
 		c.Num, err = strconv.Atoi(v)
 	}
 	if err != nil {
