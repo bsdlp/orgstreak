@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/google/go-github/github"
@@ -20,8 +21,7 @@ type contribCalendar struct {
 }
 
 type containerGroup struct {
-	Groups  []contribGroup `xml:"g"`
-	Markers []string       `xml:"text"`
+	Groups []contribGroup `xml:"g"`
 }
 
 type contribGroup struct {
@@ -34,6 +34,30 @@ type Contribution struct {
 }
 
 const dateFormat string = "2006-01-02"
+
+func (c *Contribution) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var i []interface{}
+	err := d.DecodeElement(&i, &start)
+	if err != nil {
+		return err
+	}
+
+	if v, ok := i[0].(string); ok {
+		c.Date, err = time.Parse(dateFormat, v)
+	}
+	if err != nil {
+		return err
+	}
+
+	if v, ok := i[1].(string); ok {
+		c.Num, err = strconv.Atoi(v)
+	}
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func getContributions(user github.User) []Contribution {
 	login := github.Stringify(user.Login)
@@ -58,8 +82,6 @@ func getContributions(user github.User) []Contribution {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Groups: %v\n", contribData.Group.Groups)
-
 	var contributions []Contribution
 
 	for _, group := range contribData.Group.Groups {
