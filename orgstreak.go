@@ -28,20 +28,20 @@ type contribGroup struct {
 	Rects []Contribution `xml:"rect"`
 }
 
-type Contribution struct {
-	Date time.Time `xml:"data-date,attr"`
-	Num  int       `xml:"data-count,attr"`
-}
-
-type contributionXML struct {
+type Rect struct {
 	Date string `xml:"data-date,attr"`
 	Num  string `xml:"data-count,attr"`
+}
+
+type Contribution struct {
+	Date time.Time
+	Num  int
 }
 
 const dateFormat string = "2006-01-02"
 
 func (c *Contribution) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var i contributionXML
+	var i Rect
 	err := d.DecodeElement(&i, &start)
 	if err != nil {
 		return err
