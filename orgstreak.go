@@ -60,7 +60,7 @@ func (c *Contribution) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	return nil
 }
 
-func getContributions(user github.User) *[]Contribution {
+func getContributions(user github.User) []Contribution {
 	login := github.Stringify(user.Login)
 	url := "https://github.com/users/" + login[1:len(login)-1] + "/contributions"
 	var contribData contribCalendar
@@ -89,7 +89,7 @@ func getContributions(user github.User) *[]Contribution {
 		contributions = append(contributions, group.Rects...)
 	}
 
-	return &contributions
+	return contributions
 }
 
 func getOrgMembers(orgName string) []github.User {
@@ -106,7 +106,7 @@ func getOrgMembers(orgName string) []github.User {
 func main() {
 	flag.Parse()
 	var i interface{} = flag.Arg(0)
-	var users *[]github.User
+	var users []github.User
 
 	var v, ok = i.(string)
 	if ok == false || v == "" {
@@ -117,7 +117,7 @@ func main() {
 	}
 
 	orgContribs := make(map[time.Time]int)
-	userContributions := make(chan *[]Contribution, len(*users))
+	userContributions := make(chan []Contribution, len(users))
 
 	for _, user := range users {
 		go func(u github.User) {
@@ -125,10 +125,10 @@ func main() {
 		}(user)
 	}
 
-	for y := 0; y < len(*users); y++ {
+	for y := 0; y < len(users); y++ {
 		select {
 		case userContribution := <-userContributions:
-			for _, contrib := range *userContribution {
+			for _, contrib := range userContribution {
 				orgContribs[contrib.Date] += contrib.Num
 			}
 		}
