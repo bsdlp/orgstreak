@@ -92,7 +92,7 @@ func getContributions(user github.User) *[]Contribution {
 	return &contributions
 }
 
-func getOrgMembers(orgName string) *[]github.User {
+func getOrgMembers(orgName string) []github.User {
 	client := github.NewClient(nil)
 
 	users, _, err := client.Organizations.ListMembers(orgName, nil)
@@ -100,7 +100,7 @@ func getOrgMembers(orgName string) *[]github.User {
 		log.Fatal(err)
 	}
 
-	return &users
+	return users
 }
 
 func main() {
@@ -119,7 +119,7 @@ func main() {
 	orgContribs := make(map[time.Time]int)
 	userContributions := make(chan *[]Contribution, len(*users))
 
-	for _, user := range *users {
+	for _, user := range users {
 		go func(u github.User) {
 			userContributions <- getContributions(u)
 		}(user)
